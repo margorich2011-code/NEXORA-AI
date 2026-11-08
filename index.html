@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#edf7ff">
+<title>NEXORA AI</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#eef8ff,#e9eaff,#f8faff);
+  color:#18243b;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.orb{
+  position:absolute;width:270px;height:270px;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,#fff,#75d7ff 35%,#8885ff 70%,#c6b7ff);
+  filter:blur(1px);box-shadow:0 0 90px #8bcaff;
+  animation:float 5s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotate(0)}
+  50%{transform:translateY(-22px) rotate(8deg)}
+}
+#intro{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;text-align:center;
+  padding:25px;position:relative;overflow:hidden;
+}
+#intro .orb{top:15%;left:50%;transform:translateX(-50%)}
+.intro-content{position:relative;z-index:2;margin-top:230px}
+.logo{
+  font-size:clamp(38px,9vw,65px);font-weight:900;
+  letter-spacing:5px;
+  background:linear-gradient(90deg,#348bff,#8264ed,#31c8db);
+  -webkit-background-clip:text;color:transparent;
+}
+.subtitle{color:#71819d;margin-top:12px;font-size:15px}
+button{
+  border:0;cursor:pointer;font-weight:bold;
+  transition:.25s;
+}
+.start{
+  margin-top:32px;padding:17px 35px;border-radius:18px;
+  color:white;font-size:16px;
+  background:linear-gradient(110deg,#398eff,#8265ed,#36bfe0);
+  box-shadow:0 12px 30px #8c9cf477;
+}
+button:active{transform:scale(.96)}
+.credit{margin-top:28px;color:#8995aa;font-size:12px}
+#app{display:none;min-height:100vh}
+header{
+  height:72px;padding:0 5%;display:flex;align-items:center;
+  justify-content:space-between;background:#ffffffa8;
+  backdrop-filter:blur(18px);border-bottom:1px solid #ffffff;
+  position:sticky;top:0;z-index:5;
+}
+.brand{font-size:22px;font-weight:900;color:#557de8;letter-spacing:2px}
+.header-actions{display:flex;gap:9px}
+.small-btn{
+  padding:10px 13px;border-radius:12px;
+  background:white;color:#52627e;box-shadow:0 3px 15px #9aadd522;
+}
+main{max-width:900px;margin:auto;padding:55px 20px}
+.welcome{text-align:center;margin:30px 0 38px}
+.welcome h1{font-size:clamp(28px,6vw,42px);margin-bottom:12px}
+.welcome p{color:#7c8aa2}
+.features{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:15px;
+}
+.feature{
+  padding:23px;border-radius:22px;background:#ffffffb8;
+  border:1px solid white;box-shadow:0 8px 30px #8ba7c51c;
+}
+.feature .emoji{font-size:27px;margin-bottom:15px}
+.feature h3{margin-bottom:8px}
+.feature p{font-size:13px;color:#8290a6;line-height:1.5}
+.chatbox{
+  margin-top:28px;background:#ffffffc9;border:1px solid white;
+  border-radius:22px;padding:17px;box-shadow:0 8px 30px #8ba7c51c;
+}
+.chatbox textarea{
+  width:100%;height:85px;border:0;outline:0;resize:vertical;
+  background:transparent;font:16px Arial;color:#18243b;
+}
+.send{
+  display:block;margin-left:auto;padding:12px 22px;
+  border-radius:13px;color:white;
+  background:linear-gradient(110deg,#398eff,#8265ed);
+}
+.note{font-size:12px;color:#8995aa;text-align:center;margin-top:15px}
+@media(max-width:500px){
+  .features{grid-template-columns:1fr}
+  header{padding:0 15px}
+  main{padding:30px 15px}
+  .orb{width:220px;height:220px}
+  .intro-content{margin-top:190px}
+}
+</style>
+</head>
+
+<body>
+
+<section id="intro">
+  <div class="orb"></div>
+  <div class="intro-content">
+    <div class="logo">NEXORA AI</div>
+    <p class="subtitle">Your ideas. Our intelligence.</p>
+    <button class="start" onclick="openApp()">NEXORA AI — Boshlash →</button>
+    <p class="credit">A. Teshayev tomonidan yaratilgan</p>
+  </div>
+</section>
+
+<section id="app">
+  <header>
+    <div class="brand">NEXORA AI</div>
+    <div class="header-actions">
+      <button class="small-btn" onclick="changeLanguage()" id="lang">UZ</button>
+      <button class="small-btn" onclick="goHome()">⌂</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="welcome">
+      <h1 id="heading">Salom! NEXORA AI'ga xush kelibsiz.</h1>
+      <p id="description">Bugun qanday g‘oya ustida ishlaymiz?</p>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="emoji">✦</div>
+        <h3 id="f1">Aqlli yordamchi</h3>
+        <p id="d1">Savollaringizga javob topish va yangi g‘oyalar yaratish.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">⌘</div>
+        <h3 id="f2">Dasturlash</h3>
+        <p id="d2">Kod yozish, xatolarni tushunish va loyihalar yaratish.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">▧</div>
+        <h3 id="f3">Rasm va fayllar</h3>
+        <p id="d3">Rasmlar va hujjatlar bilan ishlash imkoniyatlari.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">◎</div>
+        <h3 id="f4">Tarjima</h3>
+        <p id="d4">Turli tillardagi matnlarni tarjima qilish.</p>
+      </div>
+    </div>
+
+    <div class="chatbox">
+      <textarea id="message" placeholder="NEXORA AI'dan biror narsa so‘rang..."></textarea>
+      <button class="send" onclick="sendMessage()" id="send">Yuborish →</button>
+      <p class="note" id="notice">AI serveri keyingi bosqichda ulanadi.</p>
+    </div>
+  </main>
+</section>
+
+<script>
+function openApp(){
+  document.getElementById("intro").style.display="none";
+  document.getElementById("app").style.display="block";
+  window.scrollTo(0,0);
+}
+function goHome(){
+  document.getElementById("app").style.display="none";
+  document.getElementById("intro").style.display="flex";
+  window.scrollTo(0,0);
+}
+let language=0;
+const languages=["UZ","RU","EN"];
+const translations=[
+  ["Salom! NEXORA AI'ga xush kelibsiz.","Bugun qanday g‘oya ustida ishlaymiz?","Aqlli yordamchi","Savollaringizga javob topish va yangi g‘oyalar yaratish.","Dasturlash","Kod yozish, xatolarni tushunish va loyihalar yaratish.","Rasm va fayllar","Rasmlar va hujjatlar bilan ishlash imkoniyatlari.","Tarjima","Turli tillardagi matnlarni tarjima qilish.","NEXORA AI'dan biror narsa so‘rang...","Yuborish →","AI serveri keyingi bosqichda ulanadi."],
+  ["Привет! Добро пожаловать в NEXORA AI.","Над какой идеей поработаем сегодня?","Умный помощник","Ответы на вопросы и создание новых идей.","Программирование","Написание кода и создание проектов.","Изображения и файлы","Работа с изображениями и документами.","Перевод","Перевод текстов на разные языки.","Спросите что-нибудь у NEXORA AI...","Отправить →","Подключение AI-сервера — следующий этап."],
+  ["Hello! Welcome to NEXORA AI.","What idea shall we work on today?","Smart assistant","Get answers and create new ideas.","Coding","Write code, understand errors and build projects.","Images and files","Work with images and documents.","Translation","Translate text into different languages.","Ask NEXORA AI anything...","Send →","AI server connection comes in the next stage."]
+];
+function changeLanguage(){
+  language=(language+1)%3;
+  const t=translations[language];
+  document.getElementById("lang").textContent=languages[language];
+  ["heading","description","f1","d1","f2","d2","f3","d3","f4","d4"].forEach((id,i)=>{
+    document.getElementById(id).textContent=t[i];
+  });
+  document.getElementById("message").placeholder=t[10];
+  document.getElementById("send").textContent=t[11];
+  document.getElementById("notice").textContent=t[12];
+}
+function sendMessage(){
+  const value=document.getElementById("message").value.trim();
+  if(!value){alert("Avval xabaringizni yozing.");return;}
+  alert("Xabaringiz qabul qilindi. AI serverini keyingi bosqichda ulaymiz.");
+}
+</script>
+</body>
+</html>

@@ -1,2 +1,0 @@
-# NEXORA-AI
-Adizbek 
