@@ -1,200 +1,368 @@
+
 <!DOCTYPE html>
 <html lang="uz">
-<script src="app.js"></script>
-  <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#edf7ff">
-<title>NEXORA AI</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#eef4ff">
+  <title>NEXORA AI</title>
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:Arial,sans-serif;
-  background:linear-gradient(135deg,#eef8ff,#e9eaff,#f8faff);
-  color:#18243b;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-.orb{
-  position:absolute;width:270px;height:270px;border-radius:50%;
-  background:radial-gradient(circle at 30% 25%,#fff,#75d7ff 35%,#8885ff 70%,#c6b7ff);
-  filter:blur(1px);box-shadow:0 0 90px #8bcaff;
-  animation:float 5s ease-in-out infinite;
-}
-@keyframes float{
-  0%,100%{transform:translateY(0) rotate(0)}
-  50%{transform:translateY(-22px) rotate(8deg)}
-}
-#intro{
-  min-height:100vh;display:flex;flex-direction:column;
-  justify-content:center;align-items:center;text-align:center;
-  padding:25px;position:relative;overflow:hidden;
-}
-#intro .orb{top:15%;left:50%;transform:translateX(-50%)}
-.intro-content{position:relative;z-index:2;margin-top:230px}
-.logo{
-  font-size:clamp(38px,9vw,65px);font-weight:900;
-  letter-spacing:5px;
-  background:linear-gradient(90deg,#348bff,#8264ed,#31c8db);
-  -webkit-background-clip:text;color:transparent;
-}
-.subtitle{color:#71819d;margin-top:12px;font-size:15px}
-button{
-  border:0;cursor:pointer;font-weight:bold;
-  transition:.25s;
-}
-.start{
-  margin-top:32px;padding:17px 35px;border-radius:18px;
-  color:white;font-size:16px;
-  background:linear-gradient(110deg,#398eff,#8265ed,#36bfe0);
-  box-shadow:0 12px 30px #8c9cf477;
-}
-button:active{transform:scale(.96)}
-.credit{margin-top:28px;color:#8995aa;font-size:12px}
-#app{display:none;min-height:100vh}
-header{
-  height:72px;padding:0 5%;display:flex;align-items:center;
-  justify-content:space-between;background:#ffffffa8;
-  backdrop-filter:blur(18px);border-bottom:1px solid #ffffff;
-  position:sticky;top:0;z-index:5;
-}
-.brand{font-size:22px;font-weight:900;color:#557de8;letter-spacing:2px}
-.header-actions{display:flex;gap:9px}
-.small-btn{
-  padding:10px 13px;border-radius:12px;
-  background:white;color:#52627e;box-shadow:0 3px 15px #9aadd522;
-}
-main{max-width:900px;margin:auto;padding:55px 20px}
-.welcome{text-align:center;margin:30px 0 38px}
-.welcome h1{font-size:clamp(28px,6vw,42px);margin-bottom:12px}
-.welcome p{color:#7c8aa2}
-.features{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:15px;
-}
-.feature{
-  padding:23px;border-radius:22px;background:#ffffffb8;
-  border:1px solid white;box-shadow:0 8px 30px #8ba7c51c;
-}
-.feature .emoji{font-size:27px;margin-bottom:15px}
-.feature h3{margin-bottom:8px}
-.feature p{font-size:13px;color:#8290a6;line-height:1.5}
-.chatbox{
-  margin-top:28px;background:#ffffffc9;border:1px solid white;
-  border-radius:22px;padding:17px;box-shadow:0 8px 30px #8ba7c51c;
-}
-.chatbox textarea{
-  width:100%;height:85px;border:0;outline:0;resize:vertical;
-  background:transparent;font:16px Arial;color:#18243b;
-}
-.send{
-  display:block;margin-left:auto;padding:12px 22px;
-  border-radius:13px;color:white;
-  background:linear-gradient(110deg,#398eff,#8265ed);
-}
-.note{font-size:12px;color:#8995aa;text-align:center;margin-top:15px}
-@media(max-width:500px){
-  .features{grid-template-columns:1fr}
-  header{padding:0 15px}
-  main{padding:30px 15px}
-  .orb{width:220px;height:220px}
-  .intro-content{margin-top:190px}
-}
-</style>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: #18213b;
+      background: linear-gradient(135deg, #eaf3ff, #f2edff, #e8faff);
+      overflow-x: hidden;
+    }
+
+    .orb {
+      position: fixed;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      filter: blur(85px);
+      opacity: .45;
+      pointer-events: none;
+      background: #9abaff;
+      top: -100px;
+      right: -80px;
+    }
+
+    .orb.two {
+      background: #c2a3ff;
+      top: auto;
+      right: auto;
+      bottom: -130px;
+      left: -100px;
+    }
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 100vh;
+      padding: 25px;
+    }
+
+    .welcome {
+      min-height: calc(100vh - 50px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .logo {
+      width: 95px;
+      height: 95px;
+      display: grid;
+      place-items: center;
+      border-radius: 30px;
+      color: white;
+      font-size: 42px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #477eff, #9c62ff);
+      box-shadow: 0 18px 45px #7c8cff55;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      font-size: clamp(38px, 8vw, 65px);
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #3678ed, #9255ef);
+      color: transparent;
+      background-clip: text;
+    }
+
+    .welcome p {
+      max-width: 520px;
+      margin: 15px 0 28px;
+      color: #65718d;
+      line-height: 1.7;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      transition: .25s;
+      font-weight: 700;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
+
+    .primary {
+      padding: 16px 30px;
+      border-radius: 15px;
+      color: white;
+      font-size: 16px;
+      background: linear-gradient(110deg, #477eff, #9255ef);
+      box-shadow: 0 10px 25px #718cff55;
+    }
+
+    #app {
+      display: none;
+      max-width: 1050px;
+      margin: auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 35px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 25px;
+      font-weight: 900;
+      color: #477eff;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    select, .home-btn {
+      border: 1px solid #dce4f5;
+      background: #ffffffb8;
+      color: #283653;
+      padding: 11px 14px;
+      border-radius: 12px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .intro h2 {
+      font-size: clamp(26px, 5vw, 38px);
+      margin-bottom: 10px;
+    }
+
+    .intro p {
+      color: #75809a;
+      line-height: 1.6;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 13px;
+      margin: 25px 0;
+    }
+
+    .feature {
+      padding: 18px 12px;
+      border: 1px solid #ffffff;
+      border-radius: 18px;
+      background: #ffffffa8;
+      box-shadow: 0 8px 25px #6078aa12;
+      text-align: center;
+    }
+
+    .feature span {
+      font-size: 25px;
+      display: block;
+      margin-bottom: 9px;
+    }
+
+    .feature b {
+      font-size: 13px;
+    }
+
+    .chatbox {
+      background: #ffffffc9;
+      border: 1px solid #ffffff;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 15px 45px #6179a51c;
+    }
+
+    #chat {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    .message {
+      max-width: 88%;
+      padding: 13px 16px;
+      border-radius: 16px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .user-message {
+      align-self: flex-end;
+      color: white;
+      background: linear-gradient(110deg, #477eff, #9255ef);
+      border-bottom-right-radius: 5px;
+    }
+
+    .ai-message {
+      align-self: flex-start;
+      color: #263653;
+      background: #edf2ff;
+      border-bottom-left-radius: 5px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      padding: 15px;
+      border: 1px solid #dce4f5;
+      border-radius: 15px;
+      outline: none;
+      background: #f9fbff;
+      color: #18213b;
+      font-size: 15px;
+    }
+
+    textarea:focus {
+      border-color: #789aff;
+      box-shadow: 0 0 0 3px #789aff22;
+    }
+
+    .chat-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    #notice {
+      color: #77829a;
+      font-size: 12px;
+    }
+
+    .send-btn {
+      padding: 13px 24px;
+      border-radius: 13px;
+      background: linear-gradient(110deg, #477eff, #9255ef);
+      color: white;
+    }
+
+    .send-btn:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    footer {
+      text-align: center;
+      color: #8791a8;
+      font-size: 12px;
+      margin-top: 25px;
+      padding-bottom: 15px;
+    }
+
+    @media (max-width: 650px) {
+      .features {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .screen {
+        padding: 16px;
+      }
+
+      .chatbox {
+        padding: 14px;
+      }
+
+      .message {
+        max-width: 95%;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-<section id="intro">
   <div class="orb"></div>
-  <div class="intro-content">
-    <div class="logo">NEXORA AI</div>
-    <p class="subtitle">Your ideas. Our intelligence.</p>
-    <button class="start" onclick="openApp()">NEXORA AI — Boshlash →</button>
-    <p class="credit">A. Teshayev tomonidan yaratilgan</p>
-  </div>
-</section>
+  <div class="orb two"></div>
 
-<section id="app">
-  <header>
-    <div class="brand">NEXORA AI</div>
-    <div class="header-actions">
-      <button class="small-btn" onclick="changeLanguage()" id="lang">UZ</button>
-      <button class="small-btn" onclick="goHome()">⌂</button>
-    </div>
-  </header>
+  <main class="screen">
+    <section class="welcome" id="intro">
+      <div class="logo">N</div>
+      <h1>NEXORA AI</h1>
+      <p id="welcomeText">
+        Sun'iy intellekt yordamida savollaringizga javob oling,
+        g'oyalar yarating va yangi imkoniyatlarni kashf eting.
+      </p>
+      <button class="primary" id="enterButton" onclick="openApp()">
+        Platformaga kirish
+      </button>
+    </section>
 
-  <main>
-    <div class="welcome">
-      <h1 id="heading">Salom! NEXORA AI'ga xush kelibsiz.</h1>
-      <p id="description">Bugun qanday g‘oya ustida ishlaymiz?</p>
-    </div>
+    <section id="app">
+      <header>
+        <div class="brand">✦ NEXORA AI</div>
+        <div class="header-actions">
+          <select id="lang" onchange="changeLanguage(this.value)">
+            <option value="uz">O'zbekcha</option>
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+          </select>
+          <button class="home-btn" onclick="goHome()">⌂</button>
+        </div>
+      </header>
 
-    <div class="features">
-      <div class="feature">
-        <div class="emoji">✦</div>
-        <h3 id="f1">Aqlli yordamchi</h3>
-        <p id="d1">Savollaringizga javob topish va yangi g‘oyalar yaratish.</p>
+      <div class="intro">
+        <h2 id="heading">NEXORA AI yordamchingiz</h2>
+        <p id="description">
+          Savolingizni yozing. NEXORA AI sizga yordam beradi.
+        </p>
       </div>
-      <div class="feature">
-        <div class="emoji">⌘</div>
-        <h3 id="f2">Dasturlash</h3>
-        <p id="d2">Kod yozish, xatolarni tushunish va loyihalar yaratish.</p>
-      </div>
-      <div class="feature">
-        <div class="emoji">▧</div>
-        <h3 id="f3">Rasm va fayllar</h3>
-        <p id="d3">Rasmlar va hujjatlar bilan ishlash imkoniyatlari.</p>
-      </div>
-      <div class="feature">
-        <div class="emoji">◎</div>
-        <h3 id="f4">Tarjima</h3>
-        <p id="d4">Turli tillardagi matnlarni tarjima qilish.</p>
-      </div>
-    </div>
 
-    <div class="chatbox">
-      <textarea id="message" placeholder="NEXORA AI'dan biror narsa so‘rang..."></textarea>
-      <button class="send" onclick="sendMessage()" id="send">Yuborish →</button>
-      <p class="note" id="notice">AI serveri keyingi bosqichda ulanadi.</p>
-    </div>
+      <div class="features">
+        <div class="feature"><span>✍️</span><b id="f1">Matn yozish</b></div>
+        <div class="feature"><span>💡</span><b id="f2">G'oyalar</b></div>
+        <div class="feature"><span>💻</span><b id="f3">Dasturlash</b></div>
+        <div class="feature"><span>🌍</span><b id="f4">Tarjima</b></div>
+      </div>
+
+      <div class="chatbox">
+        <div id="chat"></div>
+
+        <textarea
+          id="message"
+          placeholder="NEXORA AI ga xabar yozing..."
+        ></textarea>
+
+        <div class="chat-actions">
+          <p id="notice">Gemini 2.5 Flash bilan ishlaydi.</p>
+          <button class="send-btn" id="send" onclick="sendMessage()">
+            Yuborish ➤
+          </button>
+        </div>
+      </div>
+
+      <footer>
+        NEXORA AI · A. Teshayev tomonidan yaratilgan
+      </footer>
+    </section>
   </main>
-</section>
 
-<script>
-function openApp(){
-  document.getElementById("intro").style.display="none";
-  document.getElementById("app").style.display="block";
-  window.scrollTo(0,0);
-}
-function goHome(){
-  document.getElementById("app").style.display="none";
-  document.getElementById("intro").style.display="flex";
-  window.scrollTo(0,0);
-}
-let language=0;
-const languages=["UZ","RU","EN"];
-const translations=[
-  ["Salom! NEXORA AI'ga xush kelibsiz.","Bugun qanday g‘oya ustida ishlaymiz?","Aqlli yordamchi","Savollaringizga javob topish va yangi g‘oyalar yaratish.","Dasturlash","Kod yozish, xatolarni tushunish va loyihalar yaratish.","Rasm va fayllar","Rasmlar va hujjatlar bilan ishlash imkoniyatlari.","Tarjima","Turli tillardagi matnlarni tarjima qilish.","NEXORA AI'dan biror narsa so‘rang...","Yuborish →","AI serveri keyingi bosqichda ulanadi."],
-  ["Привет! Добро пожаловать в NEXORA AI.","Над какой идеей поработаем сегодня?","Умный помощник","Ответы на вопросы и создание новых идей.","Программирование","Написание кода и создание проектов.","Изображения и файлы","Работа с изображениями и документами.","Перевод","Перевод текстов на разные языки.","Спросите что-нибудь у NEXORA AI...","Отправить →","Подключение AI-сервера — следующий этап."],
-  ["Hello! Welcome to NEXORA AI.","What idea shall we work on today?","Smart assistant","Get answers and create new ideas.","Coding","Write code, understand errors and build projects.","Images and files","Work with images and documents.","Translation","Translate text into different languages.","Ask NEXORA AI anything...","Send →","AI server connection comes in the next stage."]
-];
-function changeLanguage(){
-  language=(language+1)%3;
-  const t=translations[language];
-  document.getElementById("lang").textContent=languages[language];
-  ["heading","description","f1","d1","f2","d2","f3","d3","f4","d4"].forEach((id,i)=>{
-    document.getElementById(id).textContent=t[i];
-  });
-  document.getElementById("message").placeholder=t[10];
-  document.getElementById("send").textContent=t[11];
-  document.getElementById("notice").textContent=t[12];
-}
-function sendMessage(){
-  const value=document.getElementById("message").value.trim();
-  if(!value){alert("Avval xabaringizni yozing.");return;}
-  alert("Xabaringiz qabul qilindi. AI serverini keyingi bosqichda ulaymiz.");
-}
-</script>
+  <script src="script.js" defer></script>
 </body>
 </html>
