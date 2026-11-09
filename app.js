@@ -1,10 +1,14 @@
 
 // =================================
 // NEXORA-AI APPLICATION ENGINE
+// Gemini 2.5 Flash
 // Created by A. Teshayev
 // =================================
 
 let language = 0;
+
+const API_URL =
+  "https://nexora-ai.adizbekteshayev671.workers.dev";
 
 const languages = ["UZ", "RU", "EN"];
 
@@ -22,7 +26,7 @@ const translations = [
     "Turli tillardagi matnlarni tarjima qilish.",
     "NEXORA AI'dan biror narsa so‘rang...",
     "Yuborish →",
-    "AI serveri keyingi bosqichda ulanadi."
+    "Gemini 2.5 Flash bilan ishlaydi."
   ],
   [
     "Привет! Добро пожаловать в NEXORA AI.",
@@ -37,7 +41,7 @@ const translations = [
     "Перевод текстов на разные языки.",
     "Спросите что-нибудь у NEXORA AI...",
     "Отправить →",
-    "Подключение AI-сервера — следующий этап."
+    "Работает с Gemini 2.5 Flash."
   ],
   [
     "Hello! Welcome to NEXORA AI.",
@@ -52,7 +56,7 @@ const translations = [
     "Translate text into different languages.",
     "Ask NEXORA AI anything...",
     "Send →",
-    "AI server connection comes in the next stage."
+    "Powered by Gemini 2.5 Flash."
   ]
 ];
 
@@ -73,27 +77,20 @@ function goHome() {
 // CHANGE LANGUAGE
 function changeLanguage() {
   language = (language + 1) % 3;
-
   const t = translations[language];
 
   document.getElementById("lang").textContent =
     languages[language];
 
   const ids = [
-    "heading",
-    "description",
-    "f1",
-    "d1",
-    "f2",
-    "d2",
-    "f3",
-    "d3",
-    "f4",
-    "d4"
+    "heading", "description",
+    "f1", "d1", "f2", "d2",
+    "f3", "d3", "f4", "d4"
   ];
 
   ids.forEach((id, i) => {
-    document.getElementById(id).textContent = t[i];
+    const el = document.getElementById(id);
+    if (el) el.textContent = t[i];
   });
 
   document.getElementById("message").placeholder = t[10];
@@ -101,31 +98,114 @@ function changeLanguage() {
   document.getElementById("notice").textContent = t[12];
 }
 
-// SEND MESSAGE
-function sendMessage() {
-  const input = document.getElementById("message");
-  const value = input.value.trim();
+// CHAT CONTAINER
+function getChat() {
+  let chat = document.getElementById("chat");
 
-  if (!value) {
-    alert(
-      language === 1
-        ? "Сначала напишите сообщение."
-        : language === 2
-        ? "Please write a message first."
-        : "Avval xabaringizni yozing."
-    );
-    return;
+  if (!chat) {
+    chat = document.createElement("div");
+    chat.id = "chat";
+    chat.style.cssText =
+      "display:flex;flex-direction:column;gap:12px;padding:15px;max-height:450px;overflow-y:auto;";
+
+    const input = document.getElementById("message");
+    if (!input) throw new Error("Message elementi topilmadi.");
+
+    const parent = input.parentElement?.parentElement;
+    if (!parent) throw new Error("Chat joyi topilmadi.");
+
+    parent.appendChild(chat);
   }
 
-  alert(
+  return chat;
+}
+
+// ADD MESSAGE
+function addMessage(text, type) {
+  const chat = getChat();
+  const bubble = document.createElement("div");
+
+  bubble.className = "message " + type;
+  bubble.textContent = text;
+
+  bubble.style.cssText =
+    "padding:12px 16px;border-radius:14px;max-width:90%;white-space:pre-wrap;overflow-wrap:anywhere;" +
+    (type === "user"
+      ? "align-self:flex-end;background:#2563eb;color:white;"
+      : "align-self:flex-start;background:#e5e7eb;color:#111827;");
+
+  chat.appendChild(bubble);
+  chat.scrollTop = chat.scrollHeight;
+
+  return bubble;
+}
+
+// SEND MESSAGE TO GEMINI
+async function sendMessage() {
+  const input = document.getElementById("message");
+  const button = document.getElementById("send");
+
+  if (!input || !button) return;
+
+  const value = input.value.trim();
+  if (!value || button.disabled) return;
+
+  addMessage(value, "user");
+  input.value = "";
+
+  button.disabled = true;
+
+  const loading = addMessage(
     language === 1
-      ? "Сообщение принято. AI-сервер будет подключён на следующем этапе."
+      ? "NEXORA AI думает..."
       : language === 2
-      ? "Message received. The AI server will be connected in the next stage."
-      : "Xabaringiz qabul qilindi. AI serveri keyingi bosqichda ulanadi."
+      ? "NEXORA AI is thinking..."
+      : "NEXORA AI javob tayyorlamoqda...",
+    "assistant"
   );
 
-  input.value = "";
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: value,
+        language: languages[language]
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Server xatosi: " + response.status
+      );
+    }
+
+    const answer = data.reply;
+
+    if (!answer) {
+      throw new Error("AI javobi topilmadi.");
+    }
+
+    loading.textContent = answer;
+
+  } catch (error) {
+    console.error("NEXORA AI error:", error);
+
+    loading.textContent =
+      language === 1
+        ? "Ошибка: " + error.message
+        : language === 2
+        ? "Error: " + error.message
+        : "Xatolik: " + error.message;
+
+  } finally {
+    button.disabled = false;
+    input.focus();
+  }
 }
 
 // ENTER TO SEND
