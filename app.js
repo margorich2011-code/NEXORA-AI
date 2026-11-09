@@ -1,4 +1,3 @@
-
 /* =====================================
    NEXORA AI — MAIN SYSTEM
    Creator: A. Teshayev
@@ -7,25 +6,11 @@
 
 "use strict";
 
-// CLOUDFLARE WORKER
+/* CLOUDFLARE WORKER */
 const API_URL =
   "https://nexora-ai.adizbekteshayev671.workers.dev/api/chat";
 
-// ELEMENTLAR
-const intro = document.getElementById("intro");
-const app = document.getElementById("app");
-const chat = document.getElementById("chat");
-const messageInput = document.getElementById("message");
-const sendButton = document.getElementById("send");
-const langSelect = document.getElementById("lang");
-const enterButton = document.getElementById("enterButton");
-const homeButton = document.getElementById("homeButton");
-
-// HOLAT
-let conversation = [];
-let isLoading = false;
-
-// TARJIMALAR
+/* TARJIMALAR */
 const translations = {
   uz: {
     enter: "Platformaga kirish",
@@ -37,13 +22,13 @@ const translations = {
     f3: "Dasturlash",
     f4: "Tarjima",
     placeholder: "NEXORA AI ga xabar yozing...",
-    notice: "Gemini 2.5 Flash bilan ishlaydi.",
-    send: "Yuborish ➤",
+    notice: "Gemini 2.5 Flash bilan ishlaydi",
+    send: "Yuborish",
     thinking: "NEXORA AI javob tayyorlamoqda...",
-    error: "Xatolik yuz berdi. Qaytadan urinib ko'ring.",
-    network: "Server bilan aloqa o'rnatilmadi.",
     greeting: "Salom! Men NEXORA AI. Sizga qanday yordam bera olaman?",
-    empty: "Avval xabar yozing."
+    empty: "Avval xabar yozing.",
+    network: "Server bilan aloqa o'rnatilmadi.",
+    error: "Xatolik yuz berdi. Qaytadan urinib ko'ring."
   },
 
   ru: {
@@ -56,13 +41,13 @@ const translations = {
     f3: "Программирование",
     f4: "Перевод",
     placeholder: "Напишите сообщение NEXORA AI...",
-    notice: "Работает на Gemini 2.5 Flash.",
-    send: "Отправить ➤",
+    notice: "Работает на Gemini 2.5 Flash",
+    send: "Отправить",
     thinking: "NEXORA AI готовит ответ...",
-    error: "Произошла ошибка. Попробуйте снова.",
-    network: "Не удалось подключиться к серверу.",
     greeting: "Здравствуйте! Я NEXORA AI. Чем могу вам помочь?",
-    empty: "Сначала напишите сообщение."
+    empty: "Сначала напишите сообщение.",
+    network: "Не удалось подключиться к серверу.",
+    error: "Произошла ошибка. Попробуйте снова."
   },
 
   en: {
@@ -75,209 +60,283 @@ const translations = {
     f3: "Programming",
     f4: "Translation",
     placeholder: "Write a message to NEXORA AI...",
-    notice: "Powered by Gemini 2.5 Flash.",
-    send: "Send ➤",
+    notice: "Powered by Gemini 2.5 Flash",
+    send: "Send",
     thinking: "NEXORA AI is preparing an answer...",
-    error: "An error occurred. Please try again.",
-    network: "Could not connect to the server.",
     greeting: "Hello! I am NEXORA AI. How can I help you?",
-    empty: "Please write a message first."
+    empty: "Please write a message first.",
+    network: "Could not connect to the server.",
+    error: "An error occurred. Please try again."
   }
 };
 
-// JORIY TIL
-function getTranslation() {
-  return translations[langSelect.value] || translations.uz;
-}
+/* ILOVA ISHGA TUSHISHI */
+document.addEventListener("DOMContentLoaded", () => {
 
-// TILNI O'ZGARTIRISH
-function changeLanguage(language) {
-  const t = translations[language] || translations.uz;
+  /* HTML ELEMENTLAR */
+  const intro = document.getElementById("intro");
+  const app = document.getElementById("app");
 
-  document.documentElement.lang = language;
+  const enterButton = document.getElementById("enterButton");
+  const homeButton = document.getElementById("homeButton");
 
-  document.getElementById("enterButton").textContent = t.enter;
-  document.getElementById("welcomeText").textContent = t.welcome;
-  document.getElementById("heading").textContent = t.heading;
-  document.getElementById("description").textContent = t.description;
+  const langSelect = document.getElementById("lang");
 
-  document.getElementById("f1").textContent = t.f1;
-  document.getElementById("f2").textContent = t.f2;
-  document.getElementById("f3").textContent = t.f3;
-  document.getElementById("f4").textContent = t.f4;
+  const chat = document.getElementById("chat");
+  const messageInput = document.getElementById("message");
+  const sendButton = document.getElementById("send");
+  const sendText = document.getElementById("sendText");
 
-  messageInput.placeholder = t.placeholder;
-  document.getElementById("notice").textContent = t.notice;
+  const welcomeText = document.getElementById("welcomeText");
+  const heading = document.getElementById("heading");
+  const description = document.getElementById("description");
 
-  if (!isLoading) {
-    sendButton.textContent = t.send;
-  }
-}
+  const notice = document.getElementById("notice");
 
-// PLATFORMAGA KIRISH
-function openApp() {
-  intro.style.display = "none";
-  app.style.display = "block";
+  const feature1 = document.getElementById("f1");
+  const feature2 = document.getElementById("f2");
+  const feature3 = document.getElementById("f3");
+  const feature4 = document.getElementById("f4");
 
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+  /* ELEMENTLARNI TEKSHIRISH */
+  const requiredElements = [
+    intro,
+    app,
+    enterButton,
+    homeButton,
+    langSelect,
+    chat,
+    messageInput,
+    sendButton
+  ];
 
-  if (chat.children.length === 0) {
-    addMessage(getTranslation().greeting, "ai");
-  }
-
-  messageInput.focus();
-}
-
-// BOSH SAHIFAGA QAYTISH
-function goHome() {
-  app.style.display = "none";
-  intro.style.display = "flex";
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-}
-
-// XABAR QO'SHISH
-function addMessage(text, type) {
-  const element = document.createElement("div");
-
-  element.className =
-    type === "user"
-      ? "message user-message"
-      : "message ai-message";
-
-  element.textContent = String(text);
-
-  chat.appendChild(element);
-
-  chat.scrollTop = chat.scrollHeight;
-
-  return element;
-}
-
-// YUKLANISH HOLATI
-function setLoading(state) {
-  isLoading = state;
-
-  sendButton.disabled = state;
-  messageInput.disabled = state;
-
-  sendButton.textContent = state
-    ? "⏳ ..."
-    : getTranslation().send;
-}
-
-// AI BILAN SUHBAT
-async function sendMessage() {
-  if (isLoading) return;
-
-  const userText = messageInput.value.trim();
-  const t = getTranslation();
-
-  if (!userText) {
-    messageInput.focus();
+  if (requiredElements.some(element => !element)) {
+    console.error("NEXORA AI: HTML elementlari topilmadi!");
     return;
   }
 
-  // Foydalanuvchi xabari
-  addMessage(userText, "user");
+  /* HOLAT */
+  let conversation = [];
+  let isLoading = false;
+  let currentLanguage = "uz";
 
-  messageInput.value = "";
+  /* TARJIMA OLISH */
+  function getTranslation() {
+    return translations[currentLanguage] || translations.uz;
+  }
 
-  conversation.push({
-    role: "user",
-    content: userText
-  });
+  /* TILNI ALMASHTIRISH */
+  function changeLanguage(language) {
+    currentLanguage = translations[language] ? language : "uz";
 
-  conversation = conversation.slice(-20);
+    const t = getTranslation();
 
-  const loadingMessage = addMessage(
-    t.thinking,
-    "ai"
-  );
+    document.documentElement.lang = currentLanguage;
 
-  setLoading(true);
+    welcomeText.textContent = t.welcome;
+    enterButton.textContent = t.enter;
 
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
+    heading.textContent = t.heading;
+    description.textContent = t.description;
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+    feature1.textContent = t.f1;
+    feature2.textContent = t.f2;
+    feature3.textContent = t.f3;
+    feature4.textContent = t.f4;
 
-      body: JSON.stringify({
-        messages: conversation
-      })
+    messageInput.placeholder = t.placeholder;
+    notice.textContent = t.notice;
+
+    if (!isLoading) {
+      sendText.textContent = t.send;
+    }
+  }
+
+  /* XABAR QO'SHISH */
+  function addMessage(text, type) {
+    const element = document.createElement("div");
+
+    element.className = type === "user"
+      ? "message user-message"
+      : "message ai-message";
+
+    element.textContent = String(text);
+
+    chat.appendChild(element);
+
+    chat.scrollTop = chat.scrollHeight;
+
+    return element;
+  }
+
+  /* PLATFORMAGA KIRISH */
+  function openApp() {
+    intro.hidden = true;
+    app.hidden = false;
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.error || `Server xatosi: ${response.status}`
-      );
+    if (chat.children.length === 0) {
+      addMessage(getTranslation().greeting, "ai");
     }
 
-    if (!data.success || !data.reply) {
-      throw new Error(data.error || t.error);
+    messageInput.focus();
+  }
+
+  /* BOSH SAHIFAGA QAYTISH */
+  function goHome() {
+    app.hidden = true;
+    intro.hidden = false;
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  /* YUKLANISH HOLATI */
+  function setLoading(state) {
+    isLoading = state;
+
+    sendButton.disabled = state;
+    messageInput.disabled = state;
+
+    sendText.textContent = state
+      ? "⏳ ..."
+      : getTranslation().send;
+  }
+
+  /* AI BILAN SUHBAT */
+  async function sendMessage() {
+
+    if (isLoading) return;
+
+    const userText = messageInput.value.trim();
+    const t = getTranslation();
+
+    if (!userText) {
+      messageInput.focus();
+      return;
     }
 
-    loadingMessage.remove();
+    addMessage(userText, "user");
 
-    addMessage(data.reply, "ai");
+    messageInput.value = "";
 
     conversation.push({
-      role: "assistant",
-      content: data.reply
+      role: "user",
+      content: userText
     });
 
     conversation = conversation.slice(-20);
 
-  } catch (error) {
-    loadingMessage.remove();
-
-    console.error("NEXORA AI:", error);
-
-    addMessage(
-      error.message || t.network,
+    const loadingMessage = addMessage(
+      t.thinking,
       "ai"
     );
 
-    // Qayta yuborish uchun xabarni tiklash
-    conversation.pop();
-    messageInput.value = userText;
+    setLoading(true);
 
-  } finally {
-    setLoading(false);
-    messageInput.focus();
+    try {
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          messages: conversation
+        })
+      });
+
+      const rawResponse = await response.text();
+
+      let data;
+
+      try {
+        data = JSON.parse(rawResponse);
+      } catch {
+        throw new Error(
+          "Server JSON formatida javob bermadi."
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Server xatosi: " + response.status
+        );
+      }
+
+      if (!data.success || !data.reply) {
+        throw new Error(
+          data.error || t.error
+        );
+      }
+
+      loadingMessage.remove();
+
+      addMessage(data.reply, "ai");
+
+      conversation.push({
+        role: "assistant",
+        content: data.reply
+      });
+
+      conversation = conversation.slice(-20);
+
+    } catch (error) {
+
+      loadingMessage.remove();
+
+      console.error("NEXORA AI xatosi:", error);
+
+      addMessage(
+        error.message || t.network,
+        "ai"
+      );
+
+      conversation.pop();
+
+      messageInput.value = userText;
+
+    } finally {
+
+      setLoading(false);
+      messageInput.focus();
+
+    }
   }
-}
 
-// TUGMALARNI ULASH
-enterButton.addEventListener("click", openApp);
-homeButton.addEventListener("click", goHome);
-sendButton.addEventListener("click", sendMessage);
+  /* TUGMALARNI ULASH */
+  enterButton.addEventListener("click", openApp);
 
-// TIL TANLASH
-langSelect.addEventListener("change", function() {
-  changeLanguage(this.value);
+  homeButton.addEventListener("click", goHome);
+
+  sendButton.addEventListener("click", sendMessage);
+
+  /* TIL TANLASH */
+  langSelect.addEventListener("change", () => {
+    changeLanguage(langSelect.value);
+  });
+
+  /* ENTER ORQALI XABAR YUBORISH */
+  messageInput.addEventListener("keydown", event => {
+
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+
+  });
+
+  /* BOSHLANG'ICH SOZLAMALAR */
+  changeLanguage("uz");
+
+  console.log("NEXORA AI muvaffaqiyatli ishga tushdi!");
+
 });
-
-// ENTER BILAN YUBORISH
-messageInput.addEventListener("keydown", function(event) {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    sendMessage();
-  }
-});
-
-// BOSHLANG'ICH SOZLAMALAR
-changeLanguage("uz");
-
-console.log("NEXORA AI muvaffaqiyatli ishga tushdi!");
