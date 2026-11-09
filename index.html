@@ -1,24 +1,32 @@
-
 <!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#eef4ff">
-  <meta name="description" content="NEXORA AI — aqlli sun'iy intellekt yordamchisi">
+  <meta name="theme-color" content="#edf4ff">
+  <meta name="description" content="NEXORA AI — sun'iy intellekt yordamchingiz">
   <title>NEXORA AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
-<body>
 
-  <div class="orb"></div>
-  <div class="orb two"></div>
+<body>
+  <div class="orb orb-one"></div>
+  <div class="orb orb-two"></div>
 
   <main class="screen">
 
+    <!-- KIRISH OYNASI -->
     <section class="welcome" id="intro">
       <div class="logo">N</div>
+
+      <div class="welcome-label">NEXT GENERATION AI</div>
+
       <h1>NEXORA AI</h1>
 
       <p id="welcomeText">
@@ -27,36 +35,48 @@
       </p>
 
       <button class="primary" id="enterButton" type="button">
-        Platformaga kirish
+        Platformaga kirish <span>→</span>
       </button>
+
+      <div class="welcome-bottom">A smarter way to think</div>
     </section>
 
-    <section id="app">
+    <!-- ASOSIY ILOVA -->
+    <section id="app" class="app-container" hidden>
 
-      <header>
-        <div class="brand">✦ NEXORA AI</div>
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-icon">N</div>
+          <span>NEXORA <b>AI</b></span>
+        </div>
 
         <div class="header-actions">
           <select id="lang" aria-label="Tilni tanlash">
-            <option value="uz">O'zbekcha</option>
-            <option value="ru">Русский</option>
-            <option value="en">English</option>
+            <option value="uz">UZ</option>
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
           </select>
 
-          <button class="home-btn" id="homeButton" type="button">
+          <button class="home-btn" id="homeButton" type="button" aria-label="Bosh sahifa">
             ⌂
           </button>
         </div>
       </header>
 
-      <div class="intro">
+      <section class="hero">
+        <div class="online-label">
+          <span class="online-dot"></span>
+          AI ASSISTANT
+        </div>
+
         <h2 id="heading">NEXORA AI yordamchingiz</h2>
+
         <p id="description">
           Savolingizni yozing. NEXORA AI sizga yordam beradi.
         </p>
-      </div>
+      </section>
 
-      <div class="features">
+      <section class="features">
         <div class="feature">
           <span>✍️</span>
           <b id="f1">Matn yozish</b>
@@ -76,27 +96,37 @@
           <span>🌍</span>
           <b id="f4">Tarjima</b>
         </div>
-      </div>
+      </section>
 
-      <div class="chatbox">
+      <section class="chatbox">
+        <div class="chat-heading">
+          <div>
+            <strong>NEXORA AI</strong>
+            <small id="notice">Gemini 2.5 Flash bilan ishlaydi</small>
+          </div>
+          <div class="chat-status">● Online</div>
+        </div>
 
         <div id="chat" aria-live="polite"></div>
 
-        <textarea
-          id="message"
-          placeholder="NEXORA AI ga xabar yozing..."
-          aria-label="Xabar yozish"
-        ></textarea>
-
-        <div class="chat-actions">
-          <p id="notice">Gemini 2.5 Flash bilan ishlaydi.</p>
+        <div class="input-area">
+          <textarea
+            id="message"
+            rows="2"
+            placeholder="NEXORA AI ga xabar yozing..."
+            aria-label="Xabar yozish"
+          ></textarea>
 
           <button class="send-btn" id="send" type="button">
-            Yuborish ➤
+            <span id="sendText">Yuborish</span>
+            <span>➤</span>
           </button>
         </div>
 
-      </div>
+        <p class="input-hint">
+          Enter — yuborish · Shift + Enter — yangi qator
+        </p>
+      </section>
 
       <footer>
         NEXORA AI · A. Teshayev tomonidan yaratilgan
@@ -104,6 +134,5 @@
 
     </section>
   </main>
-
 </body>
 </html>
