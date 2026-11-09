@@ -1,12 +1,15 @@
 
 /* =====================================
-   NEXORA AI — MAIN JAVASCRIPT
+   NEXORA AI — MAIN SYSTEM
    Creator: A. Teshayev
-   Model: Gemini 2.5 Flash
+   AI: Gemini 2.5 Flash
 ===================================== */
 
+"use strict";
+
 // CLOUDFLARE WORKER
-const API_URL = "https://nexora-ai.adizbekteshayev671.workers.dev/api/chat";
+const API_URL =
+  "https://nexora-ai.adizbekteshayev671.workers.dev/api/chat";
 
 // ELEMENTLAR
 const intro = document.getElementById("intro");
@@ -15,8 +18,10 @@ const chat = document.getElementById("chat");
 const messageInput = document.getElementById("message");
 const sendButton = document.getElementById("send");
 const langSelect = document.getElementById("lang");
+const enterButton = document.getElementById("enterButton");
+const homeButton = document.getElementById("homeButton");
 
-// SUHBAT TARIXI
+// HOLAT
 let conversation = [];
 let isLoading = false;
 
@@ -36,9 +41,9 @@ const translations = {
     send: "Yuborish ➤",
     thinking: "NEXORA AI javob tayyorlamoqda...",
     error: "Xatolik yuz berdi. Qaytadan urinib ko'ring.",
-    empty: "Iltimos, avval xabar yozing.",
     network: "Server bilan aloqa o'rnatilmadi.",
-    greeting: "Salom! Men NEXORA AI. Sizga qanday yordam bera olaman?"
+    greeting: "Salom! Men NEXORA AI. Sizga qanday yordam bera olaman?",
+    empty: "Avval xabar yozing."
   },
 
   ru: {
@@ -55,9 +60,9 @@ const translations = {
     send: "Отправить ➤",
     thinking: "NEXORA AI готовит ответ...",
     error: "Произошла ошибка. Попробуйте снова.",
-    empty: "Пожалуйста, сначала напишите сообщение.",
     network: "Не удалось подключиться к серверу.",
-    greeting: "Здравствуйте! Я NEXORA AI. Чем могу вам помочь?"
+    greeting: "Здравствуйте! Я NEXORA AI. Чем могу вам помочь?",
+    empty: "Сначала напишите сообщение."
   },
 
   en: {
@@ -74,13 +79,18 @@ const translations = {
     send: "Send ➤",
     thinking: "NEXORA AI is preparing an answer...",
     error: "An error occurred. Please try again.",
-    empty: "Please write a message first.",
     network: "Could not connect to the server.",
-    greeting: "Hello! I am NEXORA AI. How can I help you?"
+    greeting: "Hello! I am NEXORA AI. How can I help you?",
+    empty: "Please write a message first."
   }
 };
 
-// TILNI TANLASH
+// JORIY TIL
+function getTranslation() {
+  return translations[langSelect.value] || translations.uz;
+}
+
+// TILNI O'ZGARTIRISH
 function changeLanguage(language) {
   const t = translations[language] || translations.uz;
 
@@ -115,10 +125,7 @@ function openApp() {
   });
 
   if (chat.children.length === 0) {
-    addMessage(
-      translations[langSelect.value].greeting,
-      "ai"
-    );
+    addMessage(getTranslation().greeting, "ai");
   }
 
   messageInput.focus();
@@ -144,35 +151,25 @@ function addMessage(text, type) {
       ? "message user-message"
       : "message ai-message";
 
-  // Xavfsiz matn chiqarish
-  element.textContent = text;
+  element.textContent = String(text);
 
   chat.appendChild(element);
 
-  chat.scrollTo({
-    top: chat.scrollHeight,
-    behavior: "smooth"
-  });
+  chat.scrollTop = chat.scrollHeight;
 
   return element;
 }
 
-// JAVOB KUTILAYOTGANINI KO'RSATISH
+// YUKLANISH HOLATI
 function setLoading(state) {
   isLoading = state;
-
-  const t = translations[langSelect.value] || translations.uz;
 
   sendButton.disabled = state;
   messageInput.disabled = state;
 
   sendButton.textContent = state
     ? "⏳ ..."
-    : t.send;
-
-  if (!state) {
-    messageInput.disabled = false;
-  }
+    : getTranslation().send;
 }
 
 // AI BILAN SUHBAT
@@ -180,25 +177,23 @@ async function sendMessage() {
   if (isLoading) return;
 
   const userText = messageInput.value.trim();
-  const t = translations[langSelect.value] || translations.uz;
+  const t = getTranslation();
 
   if (!userText) {
     messageInput.focus();
     return;
   }
 
-  // Xabarni chiqarish
+  // Foydalanuvchi xabari
   addMessage(userText, "user");
 
   messageInput.value = "";
 
-  // Suhbat tarixiga qo'shish
   conversation.push({
     role: "user",
     content: userText
   });
 
-  // Oxirgi 20 ta xabarni saqlash
   conversation = conversation.slice(-20);
 
   const loadingMessage = addMessage(
@@ -223,23 +218,20 @@ async function sendMessage() {
 
     const data = await response.json();
 
-    if (!response.ok || !data.success) {
+    if (!response.ok) {
       throw new Error(
-        data.error || t.error
+        data.error || `Server xatosi: ${response.status}`
       );
     }
 
-    if (!data.reply) {
-      throw new Error(t.error);
+    if (!data.success || !data.reply) {
+      throw new Error(data.error || t.error);
     }
 
-    // Yuklanish yozuvini o'chirish
     loadingMessage.remove();
 
-    // AI javobini chiqarish
     addMessage(data.reply, "ai");
 
-    // Tarixga saqlash
     conversation.push({
       role: "assistant",
       content: data.reply
@@ -250,20 +242,16 @@ async function sendMessage() {
   } catch (error) {
     loadingMessage.remove();
 
-    console.error("NEXORA AI ERROR:", error);
+    console.error("NEXORA AI:", error);
 
     addMessage(
       error.message || t.network,
       "ai"
     );
 
-    // Xatolikda yuborilgan xabarni
-    // qayta yuborish imkoniyati uchun saqlash
-    messageInput.value = userText;
-
-    // Takroriy xabar qo'shilmasligi uchun
-    // tarixdan oxirgi user xabarini olib tashlash
+    // Qayta yuborish uchun xabarni tiklash
     conversation.pop();
+    messageInput.value = userText;
 
   } finally {
     setLoading(false);
@@ -271,7 +259,17 @@ async function sendMessage() {
   }
 }
 
-// ENTER ORQALI XABAR YUBORISH
+// TUGMALARNI ULASH
+enterButton.addEventListener("click", openApp);
+homeButton.addEventListener("click", goHome);
+sendButton.addEventListener("click", sendMessage);
+
+// TIL TANLASH
+langSelect.addEventListener("change", function() {
+  changeLanguage(this.value);
+});
+
+// ENTER BILAN YUBORISH
 messageInput.addEventListener("keydown", function(event) {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
@@ -279,7 +277,7 @@ messageInput.addEventListener("keydown", function(event) {
   }
 });
 
-// BOSHLANG'ICH TIL
+// BOSHLANG'ICH SOZLAMALAR
 changeLanguage("uz");
 
-console.log("NEXORA AI JavaScript muvaffaqiyatli ishga tushdi.");
+console.log("NEXORA AI muvaffaqiyatli ishga tushdi!");
